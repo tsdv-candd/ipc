@@ -1,0 +1,15 @@
+struct message
+{
+	long type;
+	char message[MSGCHARS+1]; /* allow it to be a string! */
+};
+
+/* function prototypes */
+int logServiceInit();
+/* initialises the log service client, returns a service id */
+
+int logMessage(int serviceId, char* message);
+/* logs the message message to the log service serviceID */
+
+#endif /* ifndef LOGSERVICE_H */ 
+
