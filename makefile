@@ -16,6 +16,8 @@ logclient: logclient.o logservice.o
 
 logservice.o: logservice.c logservice.h
 
-logserver: logserver.o
+logserver: logserver.o logservice.o
 
 logserver.o: logserver.c logservice.h
+
+logclient.o: logclient.c logservice.h

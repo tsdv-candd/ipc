@@ -2,6 +2,8 @@
 #include <signal.h>
 #include "logservice.h"
 
+extern int global_variable;
+
 int main()
 {
     int msqid;
@@ -22,7 +24,7 @@ int main()
         /*
          * Receive an answer of message type 1.
          */
-        if (msgrcv(msqid, &rbuf, MSGCHARS, 1, 0) < 0) {
+        if (msgrcv(msqid, &rbuf, MSGCHARS, global_variable, 0) < 0) {
             perror("msgrcv");
             exit(1);
         }
@@ -30,7 +32,7 @@ int main()
         /*
          * Print the answer.
          */
-        printf("%s\n", rbuf.message);
+        printf("Receive message %s from process PID [%d]\n", rbuf.message, rbuf.type);
     } while (1);
 
     return 0;

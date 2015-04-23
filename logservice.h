@@ -12,6 +12,8 @@
 /* key for the queue */
 #define KEY ftok("logservice.h", 'a')
 
+extern int global_variable;
+
 /* message structure */
 #define MSGCHARS 255
 /* MSGCHARS is the number of characters in the message!*/

@@ -1,6 +1,8 @@
 /* logservice.c -- implementation of the log service */
 #include "logservice.h"
 
+int global_variable;
+
 int logServiceInit()
 {
     int id;
@@ -37,8 +39,10 @@ int logMessage(int serviceId, char *message)
 
     strcpy(sbuf.message, message);
     sbuf_len = strlen(sbuf.message);
-    //sbuf.type = getpid();
-    sbuf.type = 1;
+
+    global_variable = getpid();
+
+    sbuf.type = global_variable;
 
     /*
      * Send a message.
