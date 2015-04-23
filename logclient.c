@@ -8,7 +8,11 @@ int main(int argc, char**argv)
     key_t key;
     struct message sbuf;
     size_t buf_length;
-
+    if(argc < 2) {
+        printf("Please input message to send to server\n");
+        printf("%s \"message\"\n", argv[0]);
+        exit (1);
+    }
     printf("Make me useful too!\n");
     key = KEY;
 
