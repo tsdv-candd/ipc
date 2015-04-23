@@ -33,10 +33,12 @@ int logMessage(int serviceId, char *message)
     /*
      * Create message to send.
      */
+    memset(sbuf.message, 0, MSGCHARS + 1);
 
     strcpy(sbuf.message, message);
     sbuf_len = strlen(sbuf.message);
-    sbuf.type = getpid();
+    //sbuf.type = getpid();
+    sbuf.type = 1;
 
     /*
      * Send a message.
