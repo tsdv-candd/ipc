@@ -3,12 +3,12 @@
 
 int logServiceInit()
 {
-	int id;
+    int id;
     key_t key;
     int msgflg = IPC_CREAT | 0666;
 
     key = KEY;
-    
+
     fprintf(stderr, "logServiceInit: Start(%#lx,%#o)\n", key, msgflg);
 
     /*
@@ -21,23 +21,23 @@ int logServiceInit()
         return (-1);
     }
 
-	return id;
+    return id;
 }
 
 int logMessage(int serviceId, char *message)
 {
-	int rv;
+    int rv;
     size_t sbuf_len;
     struct message sbuf;
 
     /*
      * Create message to send.
      */
-     
+
     strcpy(sbuf.message, message);
     sbuf_len = strlen(sbuf.message);
     sbuf.type = getpid();
-    
+
     /*
      * Send a message.
      */
@@ -46,8 +46,8 @@ int logMessage(int serviceId, char *message)
         perror("logMessage: msgsnd");
         return (-1);
         //exit(1);
-    } 
-    
+    }
+
     printf("Message: \"%s\" Sent\n", sbuf.message);
-	return rv;
+    return rv;
 }

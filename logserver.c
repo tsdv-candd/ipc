@@ -4,7 +4,7 @@
 
 int main()
 {
-	printf("Please make me useful!\n");
+    printf("Please make me useful!\n");
 
-	return 0;
+    return 0;
 }

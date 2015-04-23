@@ -3,8 +3,8 @@
 
 int main(int argc,char**argv)
 {
-	printf("Make me useful too!\n");
+    printf("Make me useful too!\n");
 
-	return 0;
+    return 0;
 }
 

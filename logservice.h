@@ -12,13 +12,13 @@
 /* key for the queue */
 #define KEY ftok("logservice.h", 'a')
 
-/* message structure */ 
+/* message structure */
 #define MSGCHARS 255
 /* MSGCHARS is the number of characters in the message!*/
 struct message
 {
-	long type;
-	char message[MSGCHARS+1]; /* allow it to be a string! */
+    long type;
+    char message[MSGCHARS+1]; /* allow it to be a string! */
 };
 
 /* function prototypes */
@@ -28,4 +28,4 @@ int logServiceInit();
 int logMessage(int serviceId, char* message);
 /* logs the message message to the log service serviceID */
 
-#endif /* ifndef LOGSERVICE_H */ 
+#endif /* ifndef LOGSERVICE_H */
