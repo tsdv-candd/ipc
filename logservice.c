@@ -1,7 +1,7 @@
 /* logservice.c -- implementation of the log service */
 #include "logservice.h"
 
-int global_variable;
+int client_pid;
 
 int logServiceInit()
 {
@@ -31,18 +31,19 @@ int logMessage(int serviceId, char *message)
     int rv;
     size_t sbuf_len;
     struct message sbuf;
+    int copy_len = 0;
 
     /*
      * Create message to send.
      */
     memset(sbuf.message, 0, MSGCHARS + 1);
-
-    strcpy(sbuf.message, message);
+    copy_len = strlen(message) > MSGCHARS + 1 ? (MSGCHARS) : (strlen(message) + 1);
+    strncpy(sbuf.message, message, copy_len);
     sbuf_len = strlen(sbuf.message);
 
-    global_variable = getpid();
+    client_pid = getpid();
 
-    sbuf.type = global_variable;
+    sbuf.type = client_pid;
 
     /*
      * Send a message.
@@ -51,9 +52,8 @@ int logMessage(int serviceId, char *message)
         printf ("%d, %d, %s, %d\n", serviceId, sbuf.type, sbuf.message, sbuf_len);
         perror("logMessage: msgsnd");
         return (-1);
-        //exit(1);
     }
 
-    printf("Message: \"%s\" Sent\n", sbuf.message);
+    printf("Message: \"%s\" is sent\n", sbuf.message);
     return rv;
 }

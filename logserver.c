@@ -2,7 +2,11 @@
 #include <signal.h>
 #include "logservice.h"
 
-extern int global_variable;
+extern int client_pid;
+static volatile int running = 1;
+void intHandler(int dummy) {
+    running = 0;
+}
 
 int main()
 {
@@ -11,6 +15,8 @@ int main()
     struct message rbuf;
 
     key = KEY;
+
+    signal(SIGINT, intHandler);
 
     printf("Please make me useful!\n");
     if ((msqid = msgget(key, 0666)) < 0) {
@@ -22,9 +28,9 @@ int main()
         memset(rbuf.message, 0, MSGCHARS + 1);
 
         /*
-         * Receive an answer of message type 1.
+         * Receive an answer of message type client_pid.
          */
-        if (msgrcv(msqid, &rbuf, MSGCHARS, global_variable, 0) < 0) {
+        if (msgrcv(msqid, &rbuf, MSGCHARS, client_pid, 0) < 0) {
             perror("msgrcv");
             exit(1);
         }
@@ -33,7 +39,8 @@ int main()
          * Print the answer.
          */
         printf("Receive message %s from process PID [%d]\n", rbuf.message, rbuf.type);
-    } while (1);
+    } while (running);
 
+    printf("Exit server program\n");
     return 0;
 }

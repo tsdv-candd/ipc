@@ -7,7 +7,7 @@
 
 if [ $(uname) == "Darwin" ]
 then
-	
+
 	osascript -e 'tell application "Terminal" to do script "cd '$PWD'; \
                  ./logserver; exit; "'
 else

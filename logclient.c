@@ -8,6 +8,7 @@ int main(int argc, char**argv)
     key_t key;
     struct message sbuf;
     size_t buf_length;
+    int result = -1;
     if(argc < 2) {
         printf("Please input message to send to server\n");
         printf("%s \"message\"\n", argv[0]);
@@ -21,9 +22,11 @@ int main(int argc, char**argv)
         printf("logServiceInit failed[%d]\n", msqid);
     }
 
-    logMessage(msqid, argv[1]);
-
-
+    result = logMessage(msqid, argv[1]);
+    if(result == -1 ) {
+        printf("logServiceInit failed[%d]\n", result);
+        exit (1);
+    }
     return 0;
 }
 

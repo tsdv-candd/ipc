@@ -12,7 +12,7 @@
 /* key for the queue */
 #define KEY ftok("logservice.h", 'a')
 
-extern int global_variable;
+extern int client_pid;
 
 /* message structure */
 #define MSGCHARS 255
@@ -25,9 +25,16 @@ struct message
 
 /* function prototypes */
 int logServiceInit();
-/* initialises the log service client, returns a service id */
+/* 	initialises the log service client,
+	returns a service id (queue ID of the receive queue).
+*/
 
 int logMessage(int serviceId, char* message);
-/* logs the message message to the log service serviceID */
+/* 	logs the message message to the log service serviceID
+	serviceId 	-> queue ID of the receive queue
+	message		-> message will be send to the queue (queue ID = serviceID)
+	Note: If the length of the message greater than MSGCHARS,
+	Only MSGCHARS character is sent to the message queue.
+*/
 
 #endif /* ifndef LOGSERVICE_H */
