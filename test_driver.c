@@ -79,7 +79,6 @@ static void test_logMessage_Success1(void) {
         exit(1);
     }
 
-    printf("get message [%s]\n", rbuf.message);
     CU_ASSERT_NSTRING_EQUAL(rbuf.message, str1, strlen(str1));
 
 }
