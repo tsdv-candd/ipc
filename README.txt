@@ -21,7 +21,9 @@ $ ./test_driver
 Step3. Launch server to waiting for receive message
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Run the command
-$. /logserve
+$ ./logserver
+OR
+$ ./launch_server.sh in case you are running on the Linux environment with xterm installed
 
 Step4. Send the message from client to the server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
