@@ -1,5 +1,6 @@
 /* logserver.c -- implementation of the log server */
 #include <signal.h>
+#include <errno.h>
 #include "logservice.h"
 
 /*
@@ -19,14 +20,16 @@ void ctl_and_C_handler(int dummy) {
 int main()
 {
     int msqid;
-
+	int result = 0;
     /*
      * For creating message queue
      */
     int msgflg = IPC_CREAT | 0666;
     struct message rbuf;
 
-    //For handling Ctr + C key
+    /* 
+	 * For handling Ctr + C key
+	 */
     signal(SIGINT, ctl_and_C_handler);
 
     printf("Please make me useful!\n");
@@ -64,7 +67,14 @@ int main()
          */
         printf("Receive message \"%s\" from the client which PID = [%ld]\n", rbuf.message, rbuf.type);
     } while (running);
-
+	
+	result = msgctl(msqid, IPC_RMID, NULL);
+	if (result < 0) {
+		perror( strerror(errno) );
+		printf("msgctl (return queue) failed, result=%d\n", result);
+		return 1;
+	}
+	
     printf("Stop server program\n");
     return 0;
 }

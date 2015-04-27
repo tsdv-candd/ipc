@@ -38,7 +38,8 @@
  * Yes, this could have been designed better using a more
  * automated mechanism.  No, it was not done that way.
  */
-
+int msqid_global;
+	
 /*
  * Testing case 1 for the API logServiceInit
  */
@@ -114,17 +115,49 @@ static void test_logMessage_abnormal2(void) {
 
 /* Suite initialization/clean-up functions */
 static int suite_logServiceInit_init(void) {
+	 /*
+     * For creating message queue
+     */
+    int msgflg = IPC_CREAT | 0666;
+	
+	if ((msqid_global = msgget(KEY, msgflg)) < 0) {
+        perror("SERVER: ERROR msgget");
+        return 1;
+    }
     return 0;
 }
 static int suite_logServiceInit_clean(void) {
-    return 0;
+	int resutl = 0;
+	resutl=msgctl(msqid_global, IPC_RMID,NULL);
+	if (resutl < 0) {
+		perror( strerror(errno) );
+		printf("msgctl (return queue) failed, resutl=%d\n", resutl);
+		return 1;
+	}
+	return 0;
 }
 
 static int suite_logMessage_init(void) {
+	/*
+     * For creating message queue
+     */
+    int msgflg = IPC_CREAT | 0666;
+	
+	if ((msqid_global = msgget(KEY, msgflg)) < 0) {
+        perror("SERVER: ERROR msgget");
+        return 1;
+    }
     return 0;
 }
 static int suite_logMessage_clean(void) {
-    return 0;
+    int resutl = 0;
+	resutl=msgctl(msqid_global, IPC_RMID, NULL);
+	if (resutl < 0) {
+		perror( strerror(errno) );
+		printf("msgctl (return queue) failed, resutl=%d\n", resutl);
+		return 1;
+	}
+	return 0;
 }
 
 static CU_TestInfo tests_logServiceInit[] = {
