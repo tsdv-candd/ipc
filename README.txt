@@ -13,15 +13,18 @@ After make success, it will generates following executable file.
 test_driver -> The executable for test_driver
 logserver 	-> The executable for the log server (for receiving log message)
 logclient	-> The executable for the log client (for sending message to the logserve)
+
 Step2. Run test_driver.
 ~~~~~~~~~~~~~~~~~~~~~~
 $ ./test_driver
 
 Step3. Launch server to waiting for receive message
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Run the command
 $. /logserve
 
 Step4. Send the message from client to the server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Run the command on other terminal
 $ ./logclient "test message"
 
