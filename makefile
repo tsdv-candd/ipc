@@ -6,7 +6,7 @@
 # if typing up the file, the indented lines need to be indented
 # with TABS not spaces.
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -g
 LDFLAGS=-lcunit
 
 all: logserver logclient test_driver
@@ -25,5 +25,5 @@ logserver.o: logserver.c logservice.h
 
 logclient.o: logclient.c logservice.h
 
-test_driver: test_driver.o
-	$(CC) $(CFLAGS)  $(LDFLAGS) test_driver.o -o test_driver
+test_driver: test_driver.o logservice.o
+	$(CC) $(CFLAGS)  $(LDFLAGS) test_driver.o logservice.o -o test_driver

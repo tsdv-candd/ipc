@@ -4,7 +4,6 @@
 int main(int argc, char**argv)
 {
     int msqid;
-    struct message;
     int result = -1;
 
     /*

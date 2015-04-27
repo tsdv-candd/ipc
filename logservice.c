@@ -49,6 +49,10 @@ int logMessage(int serviceId, char *message)
     struct message sbuf;
     int copy_len = 0;
 
+    if(message == NULL) {
+        printf("The message was NULL\n");
+        return (-1);
+    }
     /*
      * Create message to send.
      */

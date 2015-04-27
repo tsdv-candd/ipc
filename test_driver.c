@@ -23,8 +23,11 @@
 #include <string.h>
 #include <assert.h>
 
+/* These header is from CUnit */
 #include <CUnit/CUnit.h>
 #include <CUnit/Basic.h>
+#include <signal.h>
+#include "logservice.h"
 
 /* WARNING - MAINTENANCE NIGHTMARE AHEAD
  *
@@ -36,59 +39,113 @@
  * automated mechanism.  No, it was not done that way.
  */
 
-static void testSuccess1(void) {
-    CU_ASSERT(1);
-}
-static void testSuccess2(void) {
-    CU_ASSERT(2);
-}
-static void testSuccess3(void) {
-    CU_ASSERT(3);
-}
-
-static void testFailure1(void) {
-    CU_ASSERT(0);
-}
-static void testFailure2(void) {
-    CU_ASSERT(0);
-}
-static void testFailure3(void) {
-    CU_ASSERT(0);
+/*
+ * Testing case 1 for the API logServiceInit
+ */
+static void test_logServiceInit_Success1(void) {
+    int result = 0;
+    result = logServiceInit();
+    CU_ASSERT_NOT_EQUAL(result, -1);
 }
 
-/* Suite initialization/cleanup functions */
-static int suite_success_init(void) {
+/*
+ * Testing case 2 for the API logServiceInit
+ */
+static void test_logServiceInit_Success2(void) {
+    int result = 0;
+    result = logServiceInit();
+    result = logServiceInit();
+    CU_ASSERT_NOT_EQUAL(result, -1);
+}
+
+/*
+ * Testing case 1 for the API logMessage
+ */
+static void test_logMessage_Success1(void) {
+    int result = 0;
+    int msqid;
+    char str1[] = "test send";
+    struct message rbuf;
+
+    msqid = logServiceInit();
+    CU_ASSERT_NOT_EQUAL(result, -1);
+
+    result = logMessage(msqid, str1);
+    CU_ASSERT_NOT_EQUAL(result, -1);
+
+    memset(rbuf.message, 0, MSGCHARS + 1);
+    if (msgrcv(msqid, &rbuf, MSGCHARS, client_pid, 0) < 0) {
+        perror("SERVER: ERROR msgrcv");
+        exit(1);
+    }
+
+    printf("get message [%s]\n", rbuf.message);
+    CU_ASSERT_NSTRING_EQUAL(rbuf.message, str1, strlen(str1));
+
+}
+
+/*
+ * Testing case 2 for the API logMessage
+ */
+static void test_logMessage_Success2(void) {
+    int result = 0;
+    result = logMessage(0, "test2");
+    CU_ASSERT_EQUAL(result, 0);
+}
+
+/*
+ * Testing case 3 for the API logMessage
+ * Test abnormal case
+ */
+static void test_logMessage_abnormal1(void) {
+    int result = 0;
+    result = logMessage(0, NULL);
+    CU_ASSERT_EQUAL(result, -1);
+}
+
+/*
+ * Testing case 4 for the API logMessage
+ * Test abnormal case
+ */
+static void test_logMessage_abnormal2(void) {
+    int result = 0;
+    result = logMessage(1, "test3");
+    CU_ASSERT_EQUAL(result, -1);
+}
+
+/* Suite initialization/clean-up functions */
+static int suite_logServiceInit_init(void) {
     return 0;
 }
-static int suite_success_clean(void) {
+static int suite_logServiceInit_clean(void) {
     return 0;
 }
 
-static int suite_failure_init(void) {
-    return 1;
+static int suite_logMessage_init(void) {
+    return 0;
 }
-static int suite_failure_clean(void) {
-    return 1;
+static int suite_logMessage_clean(void) {
+    return 0;
 }
 
-static CU_TestInfo tests_success[] = {
-    { "testSuccess1", testSuccess1 },
-    { "testSuccess2", testSuccess2 },
-    { "testSuccess3", testSuccess3 },
+static CU_TestInfo tests_logServiceInit[] = {
+    { "test_logServiceInit_Success1", test_logServiceInit_Success1 },
+    { "test_logServiceInit_Success2", test_logServiceInit_Success2 },
     CU_TEST_INFO_NULL,
 };
 
-static CU_TestInfo tests_failure[] = {
-    { "testFailure1", testFailure1 },
-    { "testFailure2", testFailure2 },
-    { "testFailure3", testFailure3 },
+static CU_TestInfo tests_logMessage[] = {
+    { "test_logMessage_Success1", test_logMessage_Success1 },
+    { "test_logMessage_Success2", test_logMessage_Success2 },
+    { "test_logMessage_abnormal1", test_logMessage_abnormal1 },
+    { "test_logMessage_abnormal2", test_logMessage_abnormal2 },
     CU_TEST_INFO_NULL,
 };
 
 
 static CU_SuiteInfo suites[] = {
-    { "suite_success_both",  suite_success_init, suite_success_clean, tests_success },
-    { "test_failure",        suite_failure_init, suite_failure_clean, tests_failure },
+    { "suite_logServiceInit",  suite_logServiceInit_init, suite_logServiceInit_clean, tests_logServiceInit },
+    { "suite_logMessage",      suite_logMessage_init, suite_logMessage_clean, tests_logMessage },
     CU_SUITE_INFO_NULL,
 };
 
@@ -105,24 +162,6 @@ void AddTests(void)
     }
 }
 
-void print_example_results(void)
-{
-    fprintf(stdout, "\n\nExpected Test Results:"
-            "\n\n  Error Handling  Type      # Run   # Pass   # Fail"
-            "\n\n  ignore errors   suites%9u%9u%9u"
-            "\n                  tests %9u%9u%9u"
-            "\n                  asserts%8u%9u%9u"
-            "\n\n  stop on error   suites%9u%9u%9u"
-            "\n                  tests %9u%9u%9u"
-            "\n                  asserts%8u%9u%9u\n\n",
-            14, 14, 3,
-            31, 10, 21,
-            89, 47, 42,
-            4, 4, 1,
-            12, 9, 3,
-            12, 9, 3);
-}
-
 /*
 	Main test program base on Cunit testing framework.
 */
@@ -130,47 +169,8 @@ int main(int argc, char* argv[])
 {
     CU_BasicRunMode mode = CU_BRM_VERBOSE;
     CU_ErrorAction error_action = CUEA_IGNORE;
-    int i;
 
     setvbuf(stdout, NULL, _IONBF, 0);
-
-    for (i=1 ; i<argc ; i++) {
-        if (!strcmp("-i", argv[i])) {
-            error_action = CUEA_IGNORE;
-        }
-        else if (!strcmp("-f", argv[i])) {
-            error_action = CUEA_FAIL;
-        }
-        else if (!strcmp("-A", argv[i])) {
-            error_action = CUEA_ABORT;
-        }
-        else if (!strcmp("-s", argv[i])) {
-            mode = CU_BRM_SILENT;
-        }
-        else if (!strcmp("-n", argv[i])) {
-            mode = CU_BRM_NORMAL;
-        }
-        else if (!strcmp("-v", argv[i])) {
-            mode = CU_BRM_VERBOSE;
-        }
-        else if (!strcmp("-e", argv[i])) {
-            print_example_results();
-            return 0;
-        }
-        else {
-            printf("\nUsage:  BasicTest [options]\n\n"
-                   "Options:   -i   ignore framework errors [default].\n"
-                   "           -f   fail on framework error.\n"
-                   "           -A   abort on framework error.\n\n"
-                   "           -s   silent mode - no output to screen.\n"
-                   "           -n   normal mode - standard output to screen.\n"
-                   "           -v   verbose mode - max output to screen [default].\n\n"
-                   "           -e   print expected test results and exit.\n"
-                   "           -h   print this message and exit.\n\n");
-            return 0;
-        }
-    }
-
     if (CU_initialize_registry()) {
         printf("\nInitialization of Test Registry failed.");
     }

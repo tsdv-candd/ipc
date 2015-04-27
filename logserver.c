@@ -9,7 +9,10 @@
 extern int client_pid;
 static volatile int running = 1;
 
-void intHandler(int dummy) {
+/*
+ * Handler the
+ */
+void ctl_and_C_handler(int dummy) {
     running = 0;
 }
 
@@ -23,7 +26,8 @@ int main()
     int msgflg = IPC_CREAT | 0666;
     struct message rbuf;
 
-    signal(SIGINT, intHandler);
+    //For handling Ctr + C key
+    signal(SIGINT, ctl_and_C_handler);
 
     printf("Please make me useful!\n");
 
@@ -56,7 +60,7 @@ int main()
         }
 
         /*
-         * Print the answer to output termial
+         * Print the answer to output terminal
          */
         printf("Receive message \"%s\" from the client which PID = [%ld]\n", rbuf.message, rbuf.type);
     } while (running);
