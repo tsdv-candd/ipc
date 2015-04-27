@@ -3,22 +3,29 @@
 
 int client_pid;
 
+/*
+ * logServiceInit : Initialise the message queue to log message to
+ * Return : returning an id if successful, and -1 on error
+ * NOTE: This function should not attempt to create the message queue,
+ * only attach it to the process, nor should it take an argument to
+ * specify the queue, there shall be only one log queue
+ */
 int logServiceInit()
 {
     int id;
-    key_t key;
-    int msgflg = IPC_CREAT | 0666;
+    /*
+     * Not create again the message queue
+     */
+    int msgflg = 0666;
 
-    key = KEY;
-
-    fprintf(stderr, "logServiceInit: Start(%#lx,%#o)\n", key, msgflg);
+    fprintf(stderr, "logServiceInit: Start(KEY [%#x],flag[%#o])\n", KEY, msgflg);
 
     /*
      * Get the message queue id for the
-     * key = , which was created by
-     * the server.
+     * which was created by the server.
+     * (Mapping by the same KEY)
      */
-    if ((id = msgget(key, msgflg )) < 0) {
+    if ((id = msgget(KEY, msgflg )) < 0) {
         perror("logServiceInit: msgget");
         return (-1);
     }
@@ -26,9 +33,18 @@ int logServiceInit()
     return id;
 }
 
+/*
+ * logMessage : This function logs the message passed as
+ * the string message to the log service id.
+ * serviceId : ID of the receiving message queue.
+ * message : pointer to the message will be sent.
+ * Return : return 0 on success and -1 on error.
+ * NOTE: If the message is too long (i.e. longer than MSGCHARS),
+ * Only send sending MSGCHARS characters to the server, remaining characters will be through away.
+ */
 int logMessage(int serviceId, char *message)
 {
-    int rv;
+    int rv = 0;
     size_t sbuf_len;
     struct message sbuf;
     int copy_len = 0;
@@ -41,15 +57,17 @@ int logMessage(int serviceId, char *message)
     strncpy(sbuf.message, message, copy_len);
     sbuf_len = strlen(sbuf.message);
 
+    /*
+     * Assign message type as client's ProcessID
+     */
     client_pid = getpid();
-
     sbuf.type = client_pid;
 
     /*
-     * Send a message.
+     * Send a message to the server
      */
     if ((rv = msgsnd(serviceId, &sbuf, sbuf_len, IPC_NOWAIT)) < 0) {
-        printf ("%d, %d, %s, %d\n", serviceId, sbuf.type, sbuf.message, sbuf_len);
+        printf ("%d, %ld, %s, %d\n", serviceId, sbuf.type, sbuf.message, sbuf_len);
         perror("logMessage: msgsnd");
         return (-1);
     }
