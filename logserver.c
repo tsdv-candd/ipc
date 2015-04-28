@@ -65,7 +65,8 @@ int main()
         /*
          * Print the answer to output terminal
          */
-        printf("Receive message \"%s\" from the client which PID = [%ld]\n", rbuf.message, rbuf.type);
+        //printf("Receive message \"%s\" from the client which PID = [%ld]\n", rbuf.message, rbuf.type);
+	printf("%ld : %s\n", rbuf.type, rbuf.message);
     } while (running);
 
     result = msgctl(msqid, IPC_RMID, NULL);
